@@ -78,8 +78,8 @@ while true; do
   mkdir -p $path
   echo ID is $userid saving to $path
   file=$path/$modified.xml
-  $cannibal "$userid" >$file #for now we don't want to auto download everything because it'll dupe
-  scp -i friend -R data friendster@85.31.187.124:delicious &
+  $cannibal "$userid" "$SERVER" >$file #for now we don't want to auto download everything because it'll dupe
+  scp -i friend -r data friendster@85.31.187.124:delicious
   mv data/* data-backup
   #| tee $file | grep "<id>" | sed -e 's/.*<id>\(.*\)<\/id>/\1/' | while read mark; do
   #grep "<id>" test.xml | sed -e 's/.*<id>\(.*\)<\/id>/\1/' | while read mark; do

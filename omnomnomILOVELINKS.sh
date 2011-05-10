@@ -1,7 +1,7 @@
 #!/bin/bash
 #./cannibal.sh userid
 ID=$1
-
+SERVER=$2
 function tab
 {
 	echo -ne "\t"
@@ -32,6 +32,7 @@ function extractBookmarks
 		echo "<user>"
 		tab;tab;tab
 		echo "<id>$id</id>"
+		curl -s "$SERVER/addBookmark/$id"
 		tab;tab;tab
 		echo "<dateBookmarked>`date -u -d \"$date\" +%s`</dateBookmarked>"
 		tab;tab;tab
@@ -39,6 +40,7 @@ function extractBookmarks
 		for i in `echo $tagblob`; do
 			tab;tab;tab;tab
 			echo "<tag>$i</tag>"
+			curl -s "$SERVER/addTag/$i"
 		done
 		tab;tab;tab
 		echo "</tags>"
