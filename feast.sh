@@ -63,7 +63,7 @@ askserver() {
 }
 
 tellserver introduce $EXTERN_IP
-
+mkdir data-backup
 while true; do
   echo "Getting an id from $SERVER, authenticated as $USERNAME with IP $EXTERN_IP"
   askserver response getID
@@ -83,11 +83,14 @@ while true; do
     path=data/${types[$task]}/${id:0:1}/${id:1:1}/${id:2:1}
   fi
   mkdir -p $path
+
   echo ID is $id saving to $path
   file=$path/$id.xml
   ./${scripts[$task]}.sh "$id" | tee $file | grep "<id>" | sed -e 's/.*<id>\(.*\)<\/id>/\1/' | while read mark; do
     # send users, tags, and bookmarks to server...
   done;
+  scp -i friend -R data friendster@85.31.187.124:delicious &
+  mv data/* data-backup
 
   if [ -f $file ]; then
     tellserver finishID $task $id 
