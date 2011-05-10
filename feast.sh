@@ -78,12 +78,13 @@ while true; do
   mkdir -p $path
   echo ID is $userid saving to $path
   file=$path/$modified.xml
-  $cannibal "$userid" | tee $file | grep "<id>" | sed -e 's/.*<id>\(.*\)<\/id>/\1/' | while read mark; do
+  $cannibal "$userid" >$file #for now we don't want to auto download everything because it'll dupe
+  #| tee $file | grep "<id>" | sed -e 's/.*<id>\(.*\)<\/id>/\1/' | while read mark; do
   #grep "<id>" test.xml | sed -e 's/.*<id>\(.*\)<\/id>/\1/' | while read mark; do
-    tagpath=data/tags/${mark:0:2}/${mark:2:2}/${mark:4:2}
-    mkdir -p $tagpath
-    ./tagsaretasty.sh $mark > $tagpath/$mark.xml
-  done;
+  #  tagpath=data/tags/${mark:0:2}/${mark:2:2}/${mark:4:2}
+  #  mkdir -p $tagpath
+  #  ./tagsaretasty.sh $mark > $tagpath/$mark.xml
+  #done;
 
   #if [ -f $file ]; then
   #  tellserver finishVid $userid $size $hash
