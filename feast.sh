@@ -1,8 +1,10 @@
 #!/bin/bash
 # feast.sh: distributed delicious mirroring script
 
-SERVER=
-cannibal=./cannibal.sh
+SERVER=http://85.31.187.124:9027/
+
+types=(users tags bookmarks)
+scripts=(cannibal tagsaretasty omnomnomILOVELINKS)
 
 while getopts :u: OPT; do
   case $OPT in
@@ -54,42 +56,44 @@ askserver() {
   for chunk in "$@"; do
     rest="$rest/$chunk"
   done
-  #export $var=`curl --silent --fail "http://$SERVER/$cmd/${USERNAME}$rest"`
-  #if [ $? != 0 ]; then
-  #  error "Couldn't contact the listerine server. The listerine server could be down, or your network."
-  #fi
+  #export $var=(`curl --silent --fail "http://$SERVER/$cmd/${USERNAME}$rest"`)
+  if [ $? != 0 ]; then
+    error "Couldn't contact the listerine server. The listerine server could be down, or your network."
+  fi
 }
 
 tellserver introduce $EXTERN_IP
 
 while true; do
-  echo "Getting a userid from $SERVER, authenticated as $USERNAME with IP $EXTERN_IP"
-  askserver userid getID
+  echo "Getting an id from $SERVER, authenticated as $USERNAME with IP $EXTERN_IP"
+  askserver response getID
   if [ $? != 0 ]; then
     error "The server didn't give us an id. This could mean the server is broken, or possibly that we're finished."
   fi
-  userid=robbiet480
-  #if [ $(echo $userid | grep "^[-0-9]*$") != $userid ]; then
-  #  error "The server did not return a valid id. It said: $userid"
+  response=(0 robbiet480)
+  task=${response[0]}
+  id=${response[1]/\./+}
+  #if [ $(echo $id | grep "^[-0-9]*$") != $id ]; then
+  #  error "The server did not return a valid id. It said: $id"
   #fi
 
-  modified=${userid/\./+}
-  path=data/users/${modified:0:1}/${modified:1:1}/${modified:2:1}
+  if $((${#id} < 3)); then
+    path=data/${types[$task]}/${id:0:1}/${id:1:1}
+  else
+    path=data/${types[$task]}/${id:0:1}/${id:1:1}/${id:2:1}
+  fi
   mkdir -p $path
-  echo ID is $userid saving to $path
-  file=$path/$modified.xml
-  $cannibal "$userid" | tee $file | grep "<id>" | sed -e 's/.*<id>\(.*\)<\/id>/\1/' | while read mark; do
-  #grep "<id>" test.xml | sed -e 's/.*<id>\(.*\)<\/id>/\1/' | while read mark; do
-    tagpath=data/tags/${mark:0:2}/${mark:2:2}/${mark:4:2}
-    mkdir -p $tagpath
-    ./tagsaretasty.sh $mark > $tagpath/$mark.xml
+  echo ID is $id saving to $path
+  file=$path/$id.xml
+  ./${scripts[$task]}.sh "$id" | tee $file | grep "<id>" | sed -e 's/.*<id>\(.*\)<\/id>/\1/' | while read mark; do
+    # send users, tags, and bookmarks to server...
   done;
 
-  #if [ -f $file ]; then
-  #  tellserver finishVid $userid $size $hash
-  #else
-  #  warning "Failed to download anything for $userid."
-  #fi
+  if [ -f $file ]; then
+    tellserver finishID $task $id 
+  else
+    warning "Failed to download anything for $id."
+  fi
   if [ -f STOP ]; then
     echo "$0: I see a file called STOP. Stopping."
     exit 0
