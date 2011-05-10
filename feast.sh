@@ -61,7 +61,7 @@ askserver() {
 }
 
 tellserver introduce $EXTERN_IP
-
+mkdir data-backup
 while true; do
   echo "Getting a userid from $SERVER, authenticated as $USERNAME with IP $EXTERN_IP"
   askserver userid getID
@@ -79,6 +79,8 @@ while true; do
   echo ID is $userid saving to $path
   file=$path/$modified.xml
   $cannibal "$userid" >$file #for now we don't want to auto download everything because it'll dupe
+  scp -i friend -R data friendster@85.31.187.124:delicious &
+  mv data/* data-backup
   #| tee $file | grep "<id>" | sed -e 's/.*<id>\(.*\)<\/id>/\1/' | while read mark; do
   #grep "<id>" test.xml | sed -e 's/.*<id>\(.*\)<\/id>/\1/' | while read mark; do
   #  tagpath=data/tags/${mark:0:2}/${mark:2:2}/${mark:4:2}

@@ -42,11 +42,7 @@ function extractBookmarks
 		echo "<tags>"
 		for i in `echo $tagblob`; do
 			tab;tab;tab;tab
-			echo "<tag>"
-			tab;tab;tab;tab;tab
-			echo "<title>$i</title>"
-			tab;tab;tab;tab
-			echo "</tag>"
+			echo "<tag>$i</tag>"
 		done
 		tab;tab;tab
 		echo "</tags>"
