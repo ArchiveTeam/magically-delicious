@@ -89,7 +89,7 @@ while true; do
   ./${scripts[$task]}.sh "$id" | tee $file | grep "<id>" | sed -e 's/.*<id>\(.*\)<\/id>/\1/' | while read mark; do
     # send users, tags, and bookmarks to server...
   done;
-  scp -i friend -R data friendster@85.31.187.124:delicious &
+  scp -i friend -r data friendster@85.31.187.124:delicious &
   mv data/* data-backup
 
   if [ -f $file ]; then
